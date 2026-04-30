@@ -1,14 +1,13 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-// IMPORTANTE: Necesario para controlar los elementos de la interfaz (Dropdowns, Sliders, Toggle)
 using UnityEngine.UI;
-using System.Collections.Generic; // Para las listas de resoluciones
+using System.Collections.Generic; 
 
 public class ControladorMenu : MonoBehaviour
 {
     [Header("Paneles Principales")]
     public GameObject panelDePausa;
-    public GameObject panelDeAjustes; // ARRASTRA AQUÍ EL NUEVO PANEL
+    public GameObject panelDeAjustes; 
 
     [Header("Componentes de Ajustes")]
     public TMPro.TMP_Dropdown dropdownResoluciones;
@@ -16,46 +15,41 @@ public class ControladorMenu : MonoBehaviour
     public Toggle togglePantallaCompleta;
     public Slider sliderAudio;
 
-    // Almacena las resoluciones disponibles
+    [Header("Configuración de Audio")]
+    public AudioSource altavozSFX;
+    public AudioClip sonidoClic;
+
     Resolution[] resolucionesDisponibles;
 
     void Start()
     {
-        // Al iniciar, ocultamos ambos paneles
         if (panelDePausa != null) panelDePausa.SetActive(false);
         if (panelDeAjustes != null) panelDeAjustes.SetActive(false);
 
-        // --- Configuración Inicial de Ajustes ---
-        // 1. Cargar Resoluciones del sistema
         SetupDropdownResoluciones();
 
-        // 2. Cargar Calidad Actual
         if (dropdownCalidad != null)
         {
             dropdownCalidad.value = QualitySettings.GetQualityLevel();
             dropdownCalidad.RefreshShownValue();
         }
 
-        // 3. Cargar Estado de Pantalla Completa
         if (togglePantallaCompleta != null)
         {
             togglePantallaCompleta.isOn = Screen.fullScreen;
         }
 
-        // 4. Cargar Volumen (Podemos usar PlayerPrefs más adelante)
         if (sliderAudio != null)
         {
             sliderAudio.value = AudioListener.volume;
         }
     }
 
-    // --- Lógica de Pausa y Ajustes ---
 
     public void AlternarPausa()
     {
         if (panelDePausa != null)
         {
-            // Si el panel de ajustes está abierto, lo cerramos primero
             if (panelDeAjustes.activeSelf)
             {
                 AbrirPuntoPausaDesdeAjustes();
@@ -71,26 +65,30 @@ public class ControladorMenu : MonoBehaviour
 
     public void AbrirPuntoPausaDesdeAjustes()
     {
-        // Cierra ajustes y vuelve a abrir pausa
         if (panelDeAjustes != null) panelDeAjustes.SetActive(false);
         if (panelDePausa != null) panelDePausa.SetActive(true);
     }
 
     public void AbrirPanelAjustes()
     {
-        // Cierra pausa y abre ajustes
         if (panelDePausa != null) panelDePausa.SetActive(false);
         if (panelDeAjustes != null) panelDeAjustes.SetActive(true);
     }
 
     // --- Funciones de Lógica de Ajustes (Las de tu imagen) ---
 
-    // 1. Audio
     public void CambiarVolumen(float volumen)
     {
         AudioListener.volume = volumen;
         Debug.Log("Volumen cambiado a: " + volumen);
-        // Aquí podrías guardar el volumen en PlayerPrefs
+    }
+
+    public void ReproducirSonidoBoton()
+    {
+        if (altavozSFX != null && sonidoClic != null)
+        {
+            altavozSFX.PlayOneShot(sonidoClic);
+        }
     }
 
     // 2. Calidad (Alto, Medio, Bajo)
@@ -98,7 +96,6 @@ public class ControladorMenu : MonoBehaviour
     {
         QualitySettings.SetQualityLevel(indexCalidad);
         Debug.Log("Calidad cambiada a index: " + indexCalidad);
-        // En los gráficos del Quality Settings de Unity debes tener los mismos indices.
     }
 
     // 3. Pantalla Completa
@@ -116,7 +113,7 @@ public class ControladorMenu : MonoBehaviour
         Debug.Log("Resolución cambiada a: " + resolucion.width + "x" + resolucion.height);
     }
 
-    // Función interna para setup de dropdown de resoluciones
+
     void SetupDropdownResoluciones()
     {
         if (dropdownResoluciones == null) return;
