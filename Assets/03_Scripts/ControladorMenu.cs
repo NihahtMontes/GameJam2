@@ -21,6 +21,14 @@ public class ControladorMenu : MonoBehaviour
 
     Resolution[] resolucionesDisponibles;
 
+    [Header("Menú Desplegable")]
+    public GameObject grupoOpciones;
+
+    [Header("Sistema de Inventario")]
+    public GameObject panelInventario;
+
+
+
     void Start()
     {
         if (panelDePausa != null) panelDePausa.SetActive(false);
@@ -77,10 +85,13 @@ public class ControladorMenu : MonoBehaviour
 
     // --- Funciones de Lógica de Ajustes (Las de tu imagen) ---
 
-    public void CambiarVolumen(float volumen)
+    public void ActualizarVolumenMaster(float valorSlider)
     {
-        AudioListener.volume = volumen;
-        Debug.Log("Volumen cambiado a: " + volumen);
+        // Aplicamos el valor directamente al oído global del juego
+        AudioListener.volume = valorSlider;
+
+        // Esto te confirmará en la consola que el valor fluye (0.0 a 1.0)
+        Debug.Log("Sincronizando volumen: " + valorSlider);
     }
 
     public void ReproducirSonidoBoton()
@@ -141,6 +152,36 @@ public class ControladorMenu : MonoBehaviour
         dropdownResoluciones.RefreshShownValue();
     }
 
+    public void ToggleMenuDesplegable()
+    {
+        if (grupoOpciones != null)
+        {
+            // Esto invierte el estado actual (si es true pasa a false y viceversa)
+            bool estadoNuevo = !grupoOpciones.activeSelf;
+            grupoOpciones.SetActive(estadoNuevo);
+
+            // Usamos tu función de sonido para que haga clic al abrirse
+            ReproducirSonidoBoton();
+        }
+    }
+
+    public void AbrirCerrarInventario()
+    {
+        if (panelInventario != null)
+        {
+            // 1. Detectamos el estado actual y lo invertimos
+            bool estaActivo = !panelInventario.activeSelf;
+
+            // 2. Activamos o desactivamos el panel
+            panelInventario.SetActive(estaActivo);
+
+            // 3. Pausamos el tiempo si el inventario está abierto (ingeniería de juego)
+            Time.timeScale = estaActivo ? 0f : 1f;
+
+            // 4. Reutilizamos tu sonido de clic
+            ReproducirSonidoBoton();
+        }
+    }
     // --- Funciones de Escenas (Las que ya tenías) ---
     public void IrAlJuego()
     {
